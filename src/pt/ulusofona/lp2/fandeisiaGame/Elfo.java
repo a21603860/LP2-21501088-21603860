@@ -18,7 +18,7 @@ public class Elfo extends Creature {
 
     public Elfo(int id, String type, int teamId, int x, int y, String orientation) {
         super(id, type, teamId, x, y, orientation);
-        image = "elf.png";
+        image = "Elfo.png";
         description = "Pode-se mover duas posições na horizontal ,na vertical e também nas diagonais, ele é muito ágil por isso pode saltar por cima de um buraco";
         cost = 5;
         mov = 2;
@@ -835,16 +835,7 @@ public class Elfo extends Creature {
         return false;
     }
 
-    @Override
-    public String getImagePNG() {
-        if (teamId == 10){
-            imagem = "lego.png";
-        }
-        if (teamId == 20){
-            imagem = "de.png";
-        }
-        return imagem;
-    }
+
 
     @Override
     public int compareTo(Object o) {

@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Druida extends Creature {
     String image;
-    String type = "Humano";
+    String type = "Druida";
     String description;
     int cost;
     int i;
@@ -18,7 +18,7 @@ public class Druida extends Creature {
 
     public Druida(int id, String type, int teamId, int x, int y, String orientation) {
         super(id, type, teamId, x, y, orientation);
-        image = "humano.png";
+        image = "Humano.png";
         description = "Pode-se mover duas posições na horizontal e na vertical";
         cost = 3;
         mov = 2;
@@ -452,16 +452,7 @@ public class Druida extends Creature {
         return false;
     }
 
-    @Override
-    public String getImagePNG() {
-        if (teamId == 10){
-            imagem = "indi.png";
-        }
-        if (teamId == 20){
-            imagem = "r.png";
-        }
-        return imagem;
-    }
+
 
     @Override
     public int compareTo(Object o) {

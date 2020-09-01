@@ -12,8 +12,8 @@ public class FandeisiaGameManager {
     private ArrayList<Hole> holes;*/
     List<String>resultados = new ArrayList<String>();
 
-    private int rows;
-    private int columns;
+    int rows;
+    int columns;
     private int currentTeam;
     private int turns = 0;
     private int totalTurns;
@@ -24,8 +24,6 @@ public class FandeisiaGameManager {
     private int plafondRES = 50;
     private int plafondP = 50;
     private int plafondAI = 50;
-    private int teamLDRPoints = 0;
-    private int teamRESPoints = 0;
     private boolean gotTreasureAI = false;
     private boolean gotTreasureP = false;
     private boolean spellAplied = false;
@@ -37,8 +35,9 @@ public class FandeisiaGameManager {
     protected int turnosSemTesouro;
     protected Team ldr = new LDR(10);
     protected Team resistence = new Resistence(20);
+    private ArrayList<ElementoDoJogo> obstaculos;
 
-    private int turnosJogados;
+    private int turnsplayed;
     protected boolean iAAtiva;
 
     private Creature[][] map;
@@ -80,6 +79,41 @@ public class FandeisiaGameManager {
 
         return array2d;
     }
+
+    public String[][] getSpellTypes() {
+        String spellType[][] = new String[9][3];
+        spellType[0][0] = "EmpurraParaNorte";
+        spellType[0][1] = "Move a criatura 1 unidade para Norte.";
+        spellType[0][2] = "1";
+        spellType[1][0] = "EmpurraParaEste";
+        spellType[1][1] = "Move a criatura 1 unidade para Este.";
+        spellType[1][2] = "1";
+        spellType[2][0] = "EmpurraParaSul";
+        spellType[2][1] = "Move a criatura 1 unidade para Sul.";
+        spellType[2][2] = "1";
+        spellType[3][0] = "EmpurraParaOeste";
+        spellType[3][1] = "Move a criatura 1 unidade para Oeste.";
+        spellType[3][2] = "1";
+        spellType[4][0] = "ReduzAlcance";
+        spellType[4][1] = "Reduz o alcance da criatura para:MIN (alcance original, 1)";
+        spellType[4][2] = "2";
+        spellType[5][0] = "DuplicaAlcance";
+        spellType[5][1] = "Aumenta o alcance da criatura para o dobro";
+        spellType[5][2] = "3";
+        spellType[6][0] = "Congela";
+        spellType[6][1] = "A criatura alvo não se move neste turno.";
+        spellType[6][2] = "3";
+        spellType[7][0] = "Congela4Ever";
+        spellType[7][1] = "A criatura alvo não se move mais até ao final do jogo.";
+        spellType[7][2] = "10";
+        spellType[8][0] = "Descongela";
+        spellType[8][1] = "Inverte a aplicação de um Feitiço Congela4Ever.";
+        spellType[8][2] = "8";
+
+
+        return spellType;
+    }
+
     public Map createComputerArmy() {
         Map<String, Integer> army = new HashMap<String, Integer>();
         Random random = new Random();
@@ -127,8 +161,9 @@ public class FandeisiaGameManager {
         ldr = new LDR(10);
         resistence = new Resistence(20);
 
-        turnosJogados = 0;
+        turnsplayed = 0;
         turnosSemTesouro = 0;
+
         creatures = new ArrayList<>();
         treasures = new ArrayList<>();
         holes = new ArrayList<>();
@@ -145,9 +180,9 @@ public class FandeisiaGameManager {
                 if (type.equals("hole")) {
                     holes.add(new Hole(Integer.parseInt(id), Integer.parseInt(x), Integer.parseInt(y)));
                 }
-        /*       if (type.equals("bronze")) {
+                 if (type.equals("bronze")) {
                     treasures.add(new Bronze(Integer.parseInt(id), Integer.parseInt(x), Integer.parseInt(y)));
-                }*/
+                }
                 if (type.equals("gold")) {
                     treasures.add(new Gold(Integer.parseInt(id), Integer.parseInt(x), Integer.parseInt(y)));
                 }
@@ -204,19 +239,104 @@ public class FandeisiaGameManager {
 
 
     public void setInitialTeam(int teamId){
+        if (teamId==10){
+           ldr.setEstadoAtivo();
+           resistence.setEstadoInativo();
+        }else{
+            ldr.setEstadoInativo();
+            resistence.setEstadoAtivo();
+        }
 
-        currentTeam = teamId;
 
+    }
+
+    private String geraFeiticoAleatorio() {
+        String spells[][] = getSpellTypes();
+        Random random = new Random();
+        int idx = random.nextInt(spells.length);
+        return spells[idx][0];
+    }
+
+    public boolean enchant(int x, int y, String spellName) {
+        if (spellName == null) {
+            return false;
+        }
+        if (spellName.trim().equals("")) {
+            return false;
+        }
+
+        String spells[][] = getSpellTypes();
+        int precoFeitico = 0;
+        for (int i = 0; i < spells.length; i++) {
+            if (spells[i][0].equals(spellName)) {
+                precoFeitico = Integer.parseInt(spells[i][2]);
+            }
+        }
+
+        if (precoFeitico == 0) {
+            return false;
+        }
+
+        if (ldr.getEstado()) {
+            if (ldr.podePagarFeitico(precoFeitico)) {
+                for (Creature creature : creatures) {
+                    if (creature.estaNestaPosicao(x, y)) {
+                        if (creature.encantaCriatura(spellName.trim(), obstaculos)) {
+                            ldr.pagaFeitico(precoFeitico);
+                            return true;
+                        }
+                    }
+                }
+            }
+
+        } else {
+            if (resistencia.podePagarFeitico(precoFeitico)) {
+                for (Creature creature : creatures) {
+                    if (creature.estaNestaPosicao(x, y)) {
+                        if (creature.encantaCriatura(spellName.trim(), obstaculos)) {
+                            resistencia.pagaFeitico(precoFeitico);
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+
+    private void jogadasDoComputador() {
+        Random random = new Random();
+        int nrCriaturasEncantar = random.nextInt(creatures.size() / 2);
+        for (int i = 0; i < nrCriaturasEncantar; i++) {
+            int idCriaturaEncantar = random.nextInt(nrCriaturasEncantar) + 1;
+            for (Creature creature : creatures) {
+                if (creature.getId() == idCriaturaEncantar) {
+                    boolean encanta = enchant(creature.getX(), creature.getY(), geraFeiticoAleatorio());
+                }
+            }
+        }
     }
 
     public void processTurn(){
 
-        if (2 % turns == 0){
-            currentTeam = teamIdLDR;
-            turns++;
+        if (resistence.getEstado() && iAAtiva){
+
         }
-        currentTeam = teamIdRES;
         turns++;
+        turnosSemTesouro++;
+
+        if (gameIsOver()!= false){
+            if (currentTeam == teamIdLDR){
+                currentTeam = teamIdRES;
+            }
+            else{
+                currentTeam = teamIdLDR;
+            }
+
+        }
+
     }
 
     public List<Creature> getCreatures(){
@@ -226,10 +346,21 @@ public class FandeisiaGameManager {
 
     public boolean gameIsOver(){
 
-        if (treasures.size() <= 0){
-            //jogo termina
+        int pontucao = ldr.pontuacao() - resistence.pontuacao();
+        int teasuresPontos=0;
+
+        if (pontucao<0){
+            pontucao = pontucao * -1;
+        }
+
+        for (Treasure treasure: treasures){
+            teasuresPontos += treasure.getPontos();
+        }
+
+        if (turnosSemTesouro>=15 || treasures.size() <= 0 || pontucao > teasuresPontos){
             return true;
         }
+
 
         return false;
     }
@@ -248,6 +379,23 @@ public class FandeisiaGameManager {
 
     public int getElementId(int x, int y){
 
+        for (Creature creature: creatures){
+            if (creature.getX() == x && creature.getY() == y){
+                return creature.getId();
+            }
+
+        }
+        for (Treasure treasure: treasures){
+            if (treasure.getX()==x && treasure.getY() == y){
+                return treasure.getId();
+            }
+        }
+
+        for (Hole hole: holes){
+            if (hole.getX()==x && hole.getY() == y){
+                return hole.getId();
+            }
+        }
         return 0;
     }
 
@@ -267,6 +415,11 @@ public class FandeisiaGameManager {
             return ldr.getMoedas();
         }
             return resistence.getMoedas();
+    }
+
+    public String getSpell(int x, int y){
+
+        return null;
     }
 
 }

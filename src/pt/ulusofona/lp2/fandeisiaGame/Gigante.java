@@ -441,16 +441,7 @@ public class Gigante extends Creature {
         }return false;
     }
 
-    @Override
-    public String getImagePNG() {
-        if (teamId == 10){
-            imagem = "z.png";
-        }
-        if (teamId == 20){
-            imagem = "z2.png";
-        }
-        return imagem;
-    }
+
 
     @Override
     public int compareTo(Object o) {

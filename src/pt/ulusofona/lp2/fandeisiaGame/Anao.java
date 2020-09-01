@@ -18,7 +18,7 @@ public class Anao extends Creature {
 
     public Anao(int id, String type, int teamId, int x, int y, String orientation) {
         super(id, type, teamId, x, y, orientation);
-        image = "anao.png";
+        image = "Anão.png";
         description = "Pode-se mover uma posição na horizontal e na vertical";
         cost = 1;
         mov = 1;
@@ -471,16 +471,8 @@ public class Anao extends Creature {
         return false;
     }
 
-    @Override
-    public String getImagePNG() {
-        if (teamId == 10){
-            imagem = "by.png";
-        }
-        if (teamId == 20){
-            imagem = "ew.png";
-        }
-        return imagem;
-    }
+
+
 
     @Override
     public int compareTo(Object o) {

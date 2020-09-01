@@ -18,7 +18,7 @@ public class Dragao extends Creature {
 
     public Dragao(int id, String type, int teamId, int x, int y, String orientation) {
         super(id, type, teamId, x, y, orientation);
-        image = "dragao.png";
+        image = "Dragão.png";
         description = "Pode-se mover três posições na horizontal ,na vertical e também nas diagonais, é ainda capaz de voar, por isso pode saltar no máximo dois boracos e/ou criaturas consecutivos";
         cost = 9;
         mov = 3;
@@ -645,16 +645,7 @@ public class Dragao extends Creature {
         return false;
     }
 
-    @Override
-    public String getImagePNG() {
-        if (teamId == 0){
-            imagem = "bd.png";
-        }
-        if (teamId == 1){
-            imagem = "rd.png";
-        }
-        return imagem;
-    }
+
 
     @Override
     public int compareTo(Object o) {

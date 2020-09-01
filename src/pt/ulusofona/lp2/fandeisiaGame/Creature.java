@@ -24,6 +24,8 @@ public abstract class Creature implements Serializable, Comparable {
     protected int kmsTravelled;
     protected int mov;
     //int columns, rows;
+    private int nrFeiticos;
+    protected String encantamento;
 
 
     @Override
@@ -43,6 +45,14 @@ public abstract class Creature implements Serializable, Comparable {
         this.x = x;
         this.y = y;
         this.orientation = orientation;
+    }
+    protected int devolveIdDaCoordenada(int x, int y, ArrayList<ElementoDoJogo> obstaculos) {
+        for (ElementoDoJogo obstaculo : obstaculos) {
+            if (obstaculo.estaNestaPosicao(x, y)) {
+                return obstaculo.getId();
+            }
+        }
+        return 0;
     }
 
     public void resetSpellCost() {
@@ -74,6 +84,60 @@ public abstract class Creature implements Serializable, Comparable {
 
     public int getKmsTravelled() {
         return kmsTravelled;
+    }
+
+    public boolean estaNestaPosicao(int x, int y) {
+        return this.x == x && this.y == y;
+    }
+
+    public boolean encantaCriatura(String spellName, ArrayList<ElementoDoJogo> obstaculos) {
+        nrFeiticos++;
+        if (encantamento == null || spellName.equals("Descongela")) {
+            encantamento = "SemEncantamento";
+        }
+
+        if (encantamento.equals("Congela4Ever")) {
+            return false;
+        }
+
+        int idPosicao = 0;
+        if (spellName.equals("EmpurraParaNorte")) {
+            idPosicao = devolveIdDaCoordenada(x, y - 1, obstaculos);
+            if (y == 0 || idPosicao != 0) {
+                return false;
+            }
+        }
+        if (spellName.equals("EmpurraParaEste")) {
+            idPosicao = devolveIdDaCoordenada(x + 1, y, obstaculos);
+            if (x == limiteEste || idPosicao != 0) {
+                return false;
+            }
+        }
+        if (spellName.equals("EmpurraParaOeste")) {
+            idPosicao = devolveIdDaCoordenada(x - 1, y, obstaculos);
+            if (x == 0 || idPosicao != 0) {
+                return false;
+            }
+        }
+        if (spellName.equals("EmpurraParaSul")) {
+            idPosicao = devolveIdDaCoordenada(x, y + 1, obstaculos);
+            if (y == limiteSul || idPosicao != 0) {
+                return false;
+            }
+        }
+        if (spellName.equals("DuplicaAlcance")) {
+            if (!validaMovimentos(obstaculos, alcance * 2)) {
+                return false;
+            }
+        }
+        if (spellName.equals("ReduzAlcance")) {
+            if (!validaMovimentos(obstaculos, 1)) {
+                return false;
+            }
+        }
+
+        encantamento = spellName;
+        return true;
     }
 
     public int getX() {
@@ -118,61 +182,8 @@ public abstract class Creature implements Serializable, Comparable {
     }
 
     public String getImagePNG() {
-        if (teamId == 10) {
-            if (orientation.equals("Norte")) {
-                imagem = "crazy_emoji_white_UP.png";
-            }
-            if (orientation.equals("Este")) {
-                imagem = "crazy_emoji_white_RIGHT.png";
-            }
-            if (orientation.equals("Sul")) {
-                imagem = "crazy_emoji_white_DOWN.png";
-            }
-            if (orientation.equals("Oeste")) {
-                imagem = "crazy_emoji_white_Left.png";
-            }
-            if (orientation.equals("Noroeste")) {
-                imagem = "setabNW.png";
-            }
-            if (orientation.equals("Nordeste")) {
-                imagem = "setawhitene.png";
-            }
-            if (orientation.equals("Sudeste")) {
-                imagem = "setawhitese.png";
-            }
-            if (orientation.equals("Sudoeste")) {
-                imagem = "setawhitesw.png";
-            }
-        }
-        if (teamId == 20) {
-            if (orientation.equals("Norte")) {
-                imagem = "crazy_emoji_black_UP.png";
-            }
-            if (orientation.equals("Este")) {
-                imagem = "crazy_emoji_black_RIGHT.png";
-            }
-            if (orientation.equals("Sul")) {
-                imagem = "crazy_emoji_black_DOWN.png";
-            }
-            if (orientation.equals("Oeste")) {
-                imagem = "crazy_emoji_black_Left.png";
-            }
-            if (orientation.equals("Noroeste")) {
-                imagem = "setaNW.png";
-            }
-            if (orientation.equals("Nordeste")) {
-                imagem = "setaNE.png";
-            }
-            if (orientation.equals("Sudoeste")) {
-                imagem = "setaSW.png";
-            }
-            if (orientation.equals("Sudeste")) {
-                imagem = "setaSE.png";
-            }
 
-
-        }
-        return imagem;
+        return type+".png";
     }
 
     public int getTeamId() {
