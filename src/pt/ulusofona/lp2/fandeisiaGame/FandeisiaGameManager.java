@@ -290,11 +290,11 @@ public class FandeisiaGameManager {
             }
 
         } else {
-            if (resistencia.podePagarFeitico(precoFeitico)) {
+            if (resistence.podePagarFeitico(precoFeitico)) {
                 for (Creature creature : creatures) {
                     if (creature.estaNestaPosicao(x, y)) {
                         if (creature.encantaCriatura(spellName.trim(), obstaculos)) {
-                            resistencia.pagaFeitico(precoFeitico);
+                            resistence.pagaFeitico(precoFeitico);
                             return true;
                         }
                     }

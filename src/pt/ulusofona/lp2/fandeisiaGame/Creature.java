@@ -23,7 +23,10 @@ public abstract class Creature implements Serializable, Comparable {
     protected int spellsNr;
     protected int kmsTravelled;
     protected int mov;
+    protected int alcance;
     //int columns, rows;
+    static protected int limiteSul;
+    static protected int limiteEste;
     private int nrFeiticos;
     protected String encantamento;
 
@@ -46,6 +49,9 @@ public abstract class Creature implements Serializable, Comparable {
         this.y = y;
         this.orientation = orientation;
     }
+
+    protected abstract boolean validaMovimentos(ArrayList<ElementoDoJogo> obstaculos, int alcance);
+
     protected int devolveIdDaCoordenada(int x, int y, ArrayList<ElementoDoJogo> obstaculos) {
         for (ElementoDoJogo obstaculo : obstaculos) {
             if (obstaculo.estaNestaPosicao(x, y)) {
