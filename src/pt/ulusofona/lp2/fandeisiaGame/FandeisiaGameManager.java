@@ -304,6 +304,7 @@ public class FandeisiaGameManager {
 
     public List<String> getAuthors() {
         List<String> authors = new ArrayList<>();
+        authors.add("Clinton Afonso");
         return authors;
     }
 
@@ -514,6 +515,8 @@ public class FandeisiaGameManager {
             return resistence.getPoints();
         }
     }
+
+
 
     public List<String> getResults() {
         List<String> resultList = new ArrayList<>();
