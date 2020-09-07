@@ -2,68 +2,61 @@ package pt.ulusofona.lp2.fandeisiaGame;
 
 public class Team {
     private int id;
-    private int moedas;
-    private int pontos;
-    private boolean estadoAtivo;
+    private int coins;
+    private boolean active;
+    private int points;
 
     public Team(int id) {
         this.id = id;
-        moedas = 50;
-        pontos = 0;
-        estadoAtivo = false;
+        points = 0;
+        coins = 50;
+        active = false;
     }
 
-    public void pagaValorDaCriatura(int custo) {
-        moedas -= custo;
+
+    public boolean passedPlafond() {
+        if(coins > 0){
+            return true;
+        }
+        return  false;
     }
 
-    public boolean ultrapassouPlafond() {
-        return moedas < 0 ? true : false;
+    public int getCoins() {
+        return coins;
     }
 
-    public int getMoedas() {
-        return moedas;
+    public void setCoins(int coins) {
+        this.coins = coins;
     }
 
-    public int pontuacao() {
-        return pontos;
+    public boolean isActive() {
+        return active;
     }
 
-    public void setEstadoAtivo() {
-        estadoAtivo = true;
+    public void setActive(boolean active) {
+        this.active = active;
     }
-
-    public void setEstadoInativo() {
-        estadoAtivo = false;
-    }
-
-    public boolean getEstado() {
-        return estadoAtivo;
-    }
-
     public int getId() {
         return id;
     }
-
-    public void setPontuacao(int pontos) {
-        this.pontos += pontos;
+    public void paySpell(int spellValue) {
+        coins -= spellValue;
+    }
+    public void addCoins(int coins) {
+        this.coins += coins;
+    }
+    public int getPoints() {
+        return points;
+    }
+    public void payCreature(int creatueValue) {
+        coins -= creatueValue;
+    }
+    public void setPoints(int points) {
+        this.points += points;
     }
 
-    public void setMoedas(int moedas) {
-        this.moedas = moedas;
-    }
 
-    public void adicionaMoedas(int moedas) {
-        this.moedas += moedas;
-    }
 
-    public boolean podePagarFeitico(int precoFeitico) {
-        return moedas - precoFeitico < 0 ? false : true;
-    }
-
-    public void pagaFeitico(int precoFeitico) {
-        moedas = moedas - precoFeitico;
-    }
 
 
 }

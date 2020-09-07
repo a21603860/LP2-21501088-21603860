@@ -1,22 +1,27 @@
 package pt.ulusofona.lp2.fandeisiaGame;
 
-public class Treasure extends GameElements   {
-    protected int pontos;
-    protected String tipo;
+public class Treasure extends GamePieces {
+    protected int value;
+    protected String type;
 
     public Treasure(int id, int x, int y) {
         super(id, x, y);
     }
 
-    public boolean posicaoDoTesouro(int x, int y) {
-        return this.x == x && this.y == y;
+    public int getValue() {
+        return value;
     }
 
-    public int getPontos() {
-        return pontos;
+    public String getType() {
+        return type;
     }
 
-    public String getTipo() {
-        return tipo;
+    public boolean thereIsTreasure(int x, int y) {
+        if(this.x == x && this.y == y){
+            return true;
+        }
+        return false;
     }
+
+
 }

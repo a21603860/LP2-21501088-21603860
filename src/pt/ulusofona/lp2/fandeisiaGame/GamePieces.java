@@ -1,13 +1,13 @@
 package pt.ulusofona.lp2.fandeisiaGame;
 
-public class ElementoDoJogo {
+public class GamePieces {
     protected int id;
     protected int x, y;
 
-    public ElementoDoJogo() {
+    public GamePieces() {
     }
 
-    public ElementoDoJogo(int id, int x, int y) {
+    public GamePieces(int id, int x, int y) {
         this.id = id;
         this.x = x;
         this.y = y;
@@ -17,8 +17,11 @@ public class ElementoDoJogo {
         return id;
     }
 
-    public boolean estaNestaPosicao(int x, int y) {
-        return this.x == x && this.y == y;
+    public boolean freeSquare(int x, int y) {
+        if(this.x == x && this.y == y){
+            return true;
+        }
+        return false;
     }
 
     public int getX() {
@@ -28,4 +31,6 @@ public class ElementoDoJogo {
     public int getY() {
         return y;
     }
+
+
 }

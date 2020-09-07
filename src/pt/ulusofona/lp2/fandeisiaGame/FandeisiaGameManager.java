@@ -1,363 +1,435 @@
 package pt.ulusofona.lp2.fandeisiaGame;
 
+import java.io.*;
 import java.util.*;
 
 public class FandeisiaGameManager {
-
-    private int maxTurns = 15;
-
-    // variaveis do jogo
-/*    ArrayList<Creature> creatures;
-    private ArrayList<Treasure> treasures;
-    private ArrayList<Hole> holes;*/
-    List<String>resultados = new ArrayList<String>();
-
-    int rows;
-    int columns;
-    private int currentTeam;
-    private int turns = 0;
-    private int totalTurns;
-    private int remainingPoints;
-    int teamIdLDR = 10;
-    int teamIdRES = 20;
-    private int plafonDPR = 50;
-    private int plafondRES = 50;
-    private int plafondP = 50;
-    private int plafondAI = 50;
-    private boolean gotTreasureAI = false;
-    private boolean gotTreasureP = false;
-    private boolean spellAplied = false;
-
-
+    protected ArrayList<Creature> creatures;
     protected ArrayList<Treasure> treasures;
     protected ArrayList<Hole> holes;
-    protected ArrayList<Creature> creatures;
-    protected int turnosSemTesouro;
+
+
     protected Team ldr = new LDR(10);
     protected Team resistence = new Resistence(20);
-    private ArrayList<ElementoDoJogo> obstaculos;
-
-    private int turnsplayed;
-    protected boolean iAAtiva;
-
-    private Creature[][] map;
-    private Creature[][] mapGig;
-
-
-    public FandeisiaGameManager() {
-    }
-
-
-
-    public String[][] getCreatureTypes(){
-        String[][] array2d = new String[5][4];
-        array2d[0][0] = "Anão";
-        array2d[0][1] = "Anão.png";
-        array2d[0][2] = "Move-se uma posição na horizontal e na vertical";
-        array2d[0][3] = "1";
-
-        array2d[1][0] = "Dragão";
-        array2d[1][1] = "Dragão.png";
-        array2d[1][2] = "Move-se três posições na horizontal ,na vertical e diagonais, é ainda capaz de voar, por isso pode saltar no máximo dois boracos e/ou criaturas consecutivos";
-        array2d[1][3] = "9";
-
-
-        array2d[2][0] = "Elfo";
-        array2d[2][1] = "Elfo.png";
-        array2d[2][2] = "Move-se duas posições na horizontal ,na vertical e diagonais, ele é muito ágil por isso pode saltar por cima de um buraco";
-        array2d[2][3] = "5";
-
-        array2d[3][0] = "Humano";
-        array2d[3][1] = "Humano.png";
-        array2d[3][2] = "Move-se duas posições na horizontal e na vertical";
-        array2d[3][3] = "3";
-
-        array2d[4][0] = "Gigante";
-        array2d[4][1] = "Gigante.png";
-        array2d[4][2] = "Move-se três posições na horizontal ou vertical, pode passar por cima de 2 buracos ou personagens consecutivos(a menos que sejam gigantes)";
-        array2d[4][3] = "5";
-
-        return array2d;
-    }
+    private ArrayList<GamePieces> creaturesAndHoles;
+    protected GameRules gameRules;
 
     public String[][] getSpellTypes() {
-        String spellType[][] = new String[9][3];
-        spellType[0][0] = "EmpurraParaNorte";
-        spellType[0][1] = "Move a criatura 1 unidade para Norte.";
-        spellType[0][2] = "1";
-        spellType[1][0] = "EmpurraParaEste";
-        spellType[1][1] = "Move a criatura 1 unidade para Este.";
-        spellType[1][2] = "1";
-        spellType[2][0] = "EmpurraParaSul";
-        spellType[2][1] = "Move a criatura 1 unidade para Sul.";
-        spellType[2][2] = "1";
-        spellType[3][0] = "EmpurraParaOeste";
-        spellType[3][1] = "Move a criatura 1 unidade para Oeste.";
-        spellType[3][2] = "1";
-        spellType[4][0] = "ReduzAlcance";
-        spellType[4][1] = "Reduz o alcance da criatura para:MIN (alcance original, 1)";
-        spellType[4][2] = "2";
-        spellType[5][0] = "DuplicaAlcance";
-        spellType[5][1] = "Aumenta o alcance da criatura para o dobro";
-        spellType[5][2] = "3";
-        spellType[6][0] = "Congela";
-        spellType[6][1] = "A criatura alvo não se move neste turno.";
-        spellType[6][2] = "3";
-        spellType[7][0] = "Congela4Ever";
-        spellType[7][1] = "A criatura alvo não se move mais até ao final do jogo.";
-        spellType[7][2] = "10";
-        spellType[8][0] = "Descongela";
-        spellType[8][1] = "Inverte a aplicação de um Feitiço Congela4Ever.";
-        spellType[8][2] = "8";
+        String retorno[][] = new String[9][3];
+        retorno[0][0] = "EmpurraParaNorte";
+        retorno[0][1] = "Move a criatura 1 unidade para Norte.";
+        retorno[0][2] = "1";
 
+        retorno[1][0] = "EmpurraParaEste";
+        retorno[1][1] = "Move a criatura 1 unidade para Este.";
+        retorno[1][2] = "1";
 
-        return spellType;
+        retorno[2][0] = "EmpurraParaSul";
+        retorno[2][1] = "Move a criatura 1 unidade para Sul.";
+        retorno[2][2] = "1";
+
+        retorno[3][0] = "EmpurraParaOeste";
+        retorno[3][1] = "Move a criatura 1 unidade para Oeste.";
+        retorno[3][2] = "1";
+
+        retorno[4][0] = "ReduzAlcance";
+        retorno[4][1] = "Reduz o alcance da criatura para:MIN (alcance original, 1)";
+        retorno[4][2] = "2";
+
+        retorno[5][0] = "DuplicaAlcance";
+        retorno[5][1] = "Aumenta o alcance da criatura para o dobro";
+        retorno[5][2] = "3";
+
+        retorno[6][0] = "Congela";
+        retorno[6][1] = "A criatura alvo não se move neste turno.";
+        retorno[6][2] = "3";
+
+        retorno[7][0] = "Congela4Ever";
+        retorno[7][1] = "A criatura alvo não se move mais até ao final do jogo.";
+        retorno[7][2] = "10";
+
+        retorno[8][0] = "Descongela";
+        retorno[8][1] = "Inverte a aplicação de um Feitiço Congela4Ever.";
+        retorno[8][2] = "8";
+        return retorno;
     }
 
-    public Map createComputerArmy() {
-        Map<String, Integer> army = new HashMap<String, Integer>();
-        Random random = new Random();
-        boolean temExercito = false;
-        do {
-            int qtdAnoes = random.nextInt(3);
-            if (qtdAnoes > 0) {
-                army.put("Anão", qtdAnoes);
-                temExercito = true;
-            }
+    public boolean saveGame(File ficheiro) {
 
-            int qtdDragoes = random.nextInt(3);
-            if (qtdDragoes > 0) {
-                army.put("Dragão", qtdDragoes);
-                temExercito = true;
-            }
+        try{
+            ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(ficheiro));
+            out.writeObject(creatures);
+            out.writeObject(treasures);
+            out.writeObject(ldr);
+            out.writeObject(resistence);
+            out.writeObject(gameRules);
 
-            int qtdElfos = random.nextInt(3);
-            if (qtdElfos > 0) {
-                army.put("Elfo", qtdElfos);
-                temExercito = true;
-            }
-
-            int qtdGigantes = random.nextInt(3);
-            if (qtdGigantes > 0) {
-                army.put("Gigante", qtdGigantes);
-                temExercito = true;
-            }
-
-            int qtdHumanos = random.nextInt(3);
-            if (qtdHumanos > 0) {
-                army.put("Humano", qtdHumanos);
-                temExercito = true;
-            }
-        } while (!temExercito);
+            out.flush();
+            out.close();
 
 
-        return army;
+        } catch (IOException e) {
+            return false;
+        }
+        return true;
     }
-    public int  startGame(String[]content, int rows, int columns){
-        //tamanho do tabuleiro
-        this.columns = columns -1;
-        this.rows = rows -1;
 
-        ldr = new LDR(10);
-        resistence = new Resistence(20);
+    public boolean loadGame(File file) {
+        try{
+            FileInputStream fi = new FileInputStream(new File(String.valueOf(file)));
+            ObjectInputStream oi = new ObjectInputStream(fi);
 
-        turnsplayed = 0;
-        turnosSemTesouro = 0;
+            // Read objects
+            creatures = (ArrayList<Creature>) oi.readObject();
+            treasures= (ArrayList<Treasure>) oi.readObject();
+            ldr= (Team) oi.readObject();
+            resistence= (Team) oi.readObject();
+            gameRules= (GameRules) oi.readObject();
 
-        creatures = new ArrayList<>();
-        treasures = new ArrayList<>();
-        holes = new ArrayList<>();
 
-        for (String linha : content) {
-            String wfield[] = linha.split(",");
-            String id = wfield[0].replace("id:", "").trim();
-            String type = wfield[1].replace("type:", "").trim();
+            oi.close();
+            fi.close();
+        } catch (IOException | ClassNotFoundException e) {
+            return false;
+        }
+        return true;
+    }
 
-            if (Integer.parseInt(id) < 0) {
+    public void processTurn() {
 
-                String x = wfield[2].replace("x:", "").trim();
-                String y = wfield[3].replace("y:", "").trim();
-                if (type.equals("hole")) {
-                    holes.add(new Hole(Integer.parseInt(id), Integer.parseInt(x), Integer.parseInt(y)));
-                }
-                 if (type.equals("bronze")) {
-                    treasures.add(new Bronze(Integer.parseInt(id), Integer.parseInt(x), Integer.parseInt(y)));
-                }
-                if (type.equals("gold")) {
-                    treasures.add(new Gold(Integer.parseInt(id), Integer.parseInt(x), Integer.parseInt(y)));
-                }
-                if (type.equals("silver")) {
-                    treasures.add(new Silver(Integer.parseInt(id), Integer.parseInt(x), Integer.parseInt(y)));
-                }
+        Collections.sort(creatures);
+        gameRules.addTurn();
+        gameRules.addTurnsWithoutTreasures();
+
+        for (Creature creature : creatures) {
+            creature.bewitchCreature();
+        }
+
+        for (Creature creature : creatures) {
+            creature.move(creaturesAndHoles,gameRules, treasures);
+        }
+        for (Creature creature : creatures) {
+            creature.clearSpells();
+        }
+
+        treatsPointsTreasures();
+
+        creaturesAndHoles = new ArrayList<>();
+        for (Hole hole : holes) {
+            creaturesAndHoles.add(hole);
+        }
+        for (Creature creature : creatures) {
+            creaturesAndHoles.add(creature);
+        }
+
+        if (!gameIsOver()) {
+            if (ldr.isActive()) {
+                ldr.setActive(false);
+                resistence.setActive(true);
             } else {
-
-                String teamId = wfield[2].replace("teamId:", "").trim();
-                String x = wfield[3].replace("x:", "").trim();
-                String y = wfield[4].replace("y:", "").trim();
-                String orientation = wfield[5].replace("orientation:", "").trim();
-
-                if (type.equals("Elfo")) {
-                    creatures.add(new Elfo(Integer.parseInt(id), type, Integer.parseInt(teamId), Integer.parseInt(x), Integer.parseInt(y), orientation));
-                }
-                if (type.equals("Dragão")) {
-                    creatures.add(new Dragao(Integer.parseInt(id), type, Integer.parseInt(teamId), Integer.parseInt(x), Integer.parseInt(y), orientation));
-                }
-                if (type.equals("Anão")) {
-                    creatures.add(new Anao(Integer.parseInt(id), type, Integer.parseInt(teamId), Integer.parseInt(x), Integer.parseInt(y), orientation));
-                }
-
-                if (type.equals("Gigante")) {
-                    creatures.add(new Gigante(Integer.parseInt(id), type, Integer.parseInt(teamId), Integer.parseInt(x), Integer.parseInt(y), orientation));
-                }
-                if (type.equals("Humano")) {
-                    creatures.add(new Humano(Integer.parseInt(id), type, Integer.parseInt(teamId), Integer.parseInt(x), Integer.parseInt(y), orientation));
-                }
-
+                ldr.setActive(true);
+                resistence.setActive(false);
             }
         }
+    }
 
 
-   /*     atualizaPlafonds();
-        if (resistencia.ultrapassouPlafond()) {
-            return 3;
-        }
-        if (ldr.ultrapassouPlafond()) {
-            return 2;
-        }
-        if (resistencia.ultrapassouPlafond() && ldr.ultrapassouPlafond()) {
-            return 1;
-        }
 
-        atualizaElementosJogo();*/
-
-
-        return 0;
+    public void toggleAI(boolean active) {
+        gameRules.setaIActive(active);
     }
 
 
 
 
-
-    public void setInitialTeam(int teamId){
-        if (teamId==10){
-           ldr.setEstadoAtivo();
-           resistence.setEstadoInativo();
-        }else{
-            ldr.setEstadoInativo();
-            resistence.setEstadoAtivo();
-        }
+    private void treatsPointsTreasures() {
+        int resistenceTreasures = 0;
+        int ldrTreasures = 0;
 
 
-    }
+        for (Creature creature : creatures) {
+            for (Treasure treasure : treasures) {
+                if (treasure.thereIsTreasure(creature.getX(), creature.getY())) {
+                    creature.setTreasurePoints(treasure.getValue());
 
-    private String geraFeiticoAleatorio() {
-        String spells[][] = getSpellTypes();
-        Random random = new Random();
-        int idx = random.nextInt(spells.length);
-        return spells[idx][0];
-    }
+                    if (creature.getTeamID() == 20) {
+                        resistence.setPoints(treasure.getValue());
+                        resistenceTreasures++;
 
-    public boolean enchant(int x, int y, String spellName) {
-        if (spellName == null) {
-            return false;
-        }
-        if (spellName.trim().equals("")) {
-            return false;
-        }
-
-        String spells[][] = getSpellTypes();
-        int precoFeitico = 0;
-        for (int i = 0; i < spells.length; i++) {
-            if (spells[i][0].equals(spellName)) {
-                precoFeitico = Integer.parseInt(spells[i][2]);
-            }
-        }
-
-        if (precoFeitico == 0) {
-            return false;
-        }
-
-        if (ldr.getEstado()) {
-            if (ldr.podePagarFeitico(precoFeitico)) {
-                for (Creature creature : creatures) {
-                    if (creature.estaNestaPosicao(x, y)) {
-                        if (creature.encantaCriatura(spellName.trim(), obstaculos)) {
-                            ldr.pagaFeitico(precoFeitico);
-                            return true;
-                        }
                     }
+                    if (creature.getTeamID() == 10) {
+                        ldr.setPoints(treasure.getValue());
+                        ldrTreasures++;
+                    }
+                    gameRules.resetTurnsWithoutTreasures();
+                    treasures.remove(treasure);
+                    break;
                 }
             }
 
+        }
+
+        if (resistenceTreasures > 0) {
+            resistence.addCoins(2);
         } else {
-            if (resistence.podePagarFeitico(precoFeitico)) {
+            resistence.addCoins(1);
+        }
+
+        if (ldrTreasures > 0) {
+            ldr.addCoins(2);
+        } else {
+            ldr.addCoins(1);
+        }
+
+
+    }
+
+
+    public boolean enchant(int x, int y, String spell) {
+        if (spell == null) {
+            return false;
+        }
+        String spells[][] = getSpellTypes();
+        int spellValue = 0;
+
+
+        for (int i = 0; i < spells.length; i++) {
+            if (spells[i][0].equals(spell)) {
+                spellValue = Integer.parseInt(spells[i][2]);
+            }
+        }
+
+
+        if (ldr.isActive()) {
+            if (ldr.getCoins() - spellValue >= 0) {
                 for (Creature creature : creatures) {
-                    if (creature.estaNestaPosicao(x, y)) {
-                        if (creature.encantaCriatura(spellName.trim(), obstaculos)) {
-                            resistence.pagaFeitico(precoFeitico);
+                    if (creature.freeSquare(x, y)) {
+                        if (creature.enchant(spell, creaturesAndHoles,gameRules, treasures)) {
+                            ldr.paySpell(spellValue);
                             return true;
                         }
                     }
                 }
             }
         }
+
+        if (resistence.isActive()) {
+            if (resistence.getCoins() - spellValue >= 0) {
+                for (Creature creature : creatures) {
+                    if (creature.freeSquare(x, y)) {
+                        if (creature.enchant(spell, creaturesAndHoles,gameRules, treasures)) {
+                            resistence.paySpell(spellValue);
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+
 
         return false;
     }
 
+    public String[][] getCreatureTypes() {
+        String creatureTypes[][] = new String[6][4];
+        creatureTypes[0][0] = "Druida";
+        creatureTypes[0][1] = "Druida.png";
+        creatureTypes[0][2] = "Move-se na horizontal e na vertical";
+        creatureTypes[0][3] = "4";
 
-    private void jogadasDoComputador() {
+        creatureTypes[1][0] = "Anão";
+        creatureTypes[1][1] = "Anão.png";
+        creatureTypes[1][2] = "Move-se uma posição na horizontal e na vertical";
+        creatureTypes[1][3] = "1";
+
+        creatureTypes[2][0] = "Humano";
+        creatureTypes[2][1] = "Humano.png";
+        creatureTypes[2][2] = "Move-se duas posições na horizontal e na vertical";
+        creatureTypes[2][3] = "3";
+
+        creatureTypes[3][0] = "Dragão";
+        creatureTypes[3][1] = "Dragão.png";
+        creatureTypes[3][2] = "Move-se três posições na horizontal ,na vertical e diagonais, é ainda capaz de voar, por isso pode saltar no máximo dois boracos e/ou criaturas consecutivos";
+        creatureTypes[3][3] = "9";
+
+        creatureTypes[5][0] = "Gigante";
+        creatureTypes[5][1] = "Gigante.png";
+        creatureTypes[5][2] = "Move-se três posições na horizontal ou vertical, pode passar por cima de 2 buracos ou personagens consecutivos(a menos que sejam gigantes)";
+        creatureTypes[5][3] = "5";
+
+        creatureTypes[4][0] = "Elfo";
+        creatureTypes[4][1] = "Elfo.png";
+        creatureTypes[4][2] = "Move-se duas posições na horizontal ,na vertical e diagonais, ele é muito ágil por isso pode saltar por cima de um buraco";
+        creatureTypes[4][3] = "5";
+
+        return creatureTypes;
+    }
+
+    public Map createComputerArmy() {
+        Map<String, Integer> computerArmy = new HashMap<String, Integer>();
         Random random = new Random();
-        int nrCriaturasEncantar = random.nextInt(creatures.size() / 2);
-        for (int i = 0; i < nrCriaturasEncantar; i++) {
-            int idCriaturaEncantar = random.nextInt(nrCriaturasEncantar) + 1;
+
+        while (computerArmy.size() ==0){
+            int quantity = random.nextInt(2);
+            if (quantity > 0) {
+                computerArmy.put("Anão", quantity);
+            }
+            quantity= random.nextInt(2);
+            if (quantity > 0) {
+                computerArmy.put("Dragão", quantity);
+            }
+            quantity= random.nextInt(2);
+            if (quantity > 0) {
+                computerArmy.put("Druida", quantity);
+            }
+            quantity= random.nextInt(2);
+            if (quantity > 0) {
+                computerArmy.put("Elfo", quantity);
+            }
+            quantity= random.nextInt(2);
+            if (quantity > 0) {
+                computerArmy.put("Humano", quantity);
+            }
+            quantity= random.nextInt(2);
+            if (quantity > 0) {
+                computerArmy.put("Gigante", quantity);
+            }
+
+        }
+
+
+        return computerArmy;
+    }
+
+    public List<String> getAuthors() {
+        List<String> authors = new ArrayList<>();
+        return authors;
+    }
+
+    public Map<String, List<String>> getStatistics() {
+        Stream stream = new Stream();
+        Map<String, List<String>> mapa = new HashMap<>();
+        mapa.put("as3MaisCarregadas", stream.tresMaisCarregadas(creatures));
+        mapa.put("as3MaisViajadas", stream.tresMaisViajadas(creatures));
+        mapa.put("as5MaisRicas", stream.cincoMaisRicas(creatures));
+        mapa.put("tiposDeCriaturaESeusTesouros", stream.tiposDeCriaturaESeusTesouros(creatures));
+        mapa.put("tiposComTesouros", stream.tiposComTesouros(creatures));
+        mapa.put("osAlvosFavoritos", stream.alvosFavoritos(creatures));
+        mapa.put("viradosPara", stream.viradosPara(creatures));
+        mapa.put("asMaisEficientes", stream.asMaisEficientes(creatures));
+        return mapa;
+    }
+
+
+
+    public void startGame(String[] content, int rows, int columns) throws InsufficientCoinsException {
+        gameRules = new GameRules(rows,columns);
+        treasures = new ArrayList<>();
+        creatures = new ArrayList<>();
+        holes = new ArrayList<>();
+
+        ldr = new LDR(10);
+        resistence = new Resistence(20);
+
+        for (String contentLine : content) {
+            String contentSplit[] = contentLine.split(",");
+            String id = contentSplit[0].replace("id:", "").trim();
+            String type = contentSplit[1].replace("type:", "").trim();
+            String x ="";
+            String y ="";
+            if (Integer.parseInt(id) > 0) {
+                String teamId = contentSplit[2].replace("teamId:", "").trim();
+                String orientation = contentSplit[5].replace("orientation:", "").trim();
+                x = contentSplit[3].replace("x:", "").trim();
+                y = contentSplit[4].replace("y:", "").trim();
+
+                switch (type){
+                    case "Elfo":
+                        creatures.add(new Elfo(Integer.parseInt(id), type,orientation, Integer.parseInt(teamId), Integer.parseInt(x), Integer.parseInt(y)  ));
+                        break;
+                    case "Anão":
+                        creatures.add(new Anao(Integer.parseInt(id), type,orientation,  Integer.parseInt(teamId), Integer.parseInt(x), Integer.parseInt(y)));
+                        break;
+                    case "Humano":
+                        creatures.add(new Humano(Integer.parseInt(id), type,orientation,  Integer.parseInt(teamId), Integer.parseInt(x), Integer.parseInt(y)));
+                        break;
+                    case "Dragão":
+                        creatures.add(new Dragao(Integer.parseInt(id), type,orientation,  Integer.parseInt(teamId), Integer.parseInt(x), Integer.parseInt(y)));
+                        break;
+                    case "Druida":
+                        creatures.add(new Druida(Integer.parseInt(id), type,orientation,  Integer.parseInt(teamId), Integer.parseInt(x), Integer.parseInt(y)));
+                        break;
+                    case "Gigante":
+                        creatures.add(new Gigante(Integer.parseInt(id), type,orientation,  Integer.parseInt(teamId), Integer.parseInt(x), Integer.parseInt(y)));
+                        break;
+                }
+
+            } else {
+                y = contentSplit[3].replace("y:", "").trim();
+                x = contentSplit[2].replace("x:", "").trim();
+                switch (type){
+                    case "hole":
+                        holes.add(new Hole(Integer.parseInt(id), Integer.parseInt(x), Integer.parseInt(y)));
+                        break;
+                    case "gold":
+                        treasures.add(new Gold(Integer.parseInt(id), Integer.parseInt(x), Integer.parseInt(y)));
+                        break;
+                    case "bronze":
+                        treasures.add(new Bronze(Integer.parseInt(id), Integer.parseInt(x), Integer.parseInt(y)));
+                        break;
+                    case "silver":
+                        treasures.add(new Silver(Integer.parseInt(id), Integer.parseInt(x), Integer.parseInt(y)));
+                        break;
+                }
+
+            }
+        }
+
+        for (Creature creature : creatures) {
+            if (creature.getTeamID() == 20) {
+                resistence.payCreature(creature.getCusto());
+            } else {
+                ldr.payCreature(creature.getCusto());
+            }
+        }
+
+        if (!resistence.passedPlafond() || !ldr.passedPlafond() || !resistence.passedPlafond() && !ldr.passedPlafond()) {
+            int costLDR =0;
+            int resistenceCost =0;
             for (Creature creature : creatures) {
-                if (creature.getId() == idCriaturaEncantar) {
-                    boolean encanta = enchant(creature.getX(), creature.getY(), geraFeiticoAleatorio());
+                if(creature.getTeamID() == 10){
+                    costLDR += creature.getCusto();
+                }else{
+                    resistenceCost += creature.getCusto();
                 }
             }
+            throw new InsufficientCoinsException(costLDR, resistenceCost);
         }
-    }
 
-    public void processTurn(){
-
-        if (resistence.getEstado() && iAAtiva){
-
+        creaturesAndHoles = new ArrayList<>();
+        for (Hole hole : holes) {
+            creaturesAndHoles.add(hole);
         }
-        turns++;
-        turnosSemTesouro++;
-
-        if (gameIsOver()!= false){
-            if (currentTeam == teamIdLDR){
-                currentTeam = teamIdRES;
-            }
-            else{
-                currentTeam = teamIdLDR;
-            }
-
+        for (Creature creature : creatures) {
+            creaturesAndHoles.add(creature);
         }
 
     }
 
-    public List<Creature> getCreatures(){
+    public boolean gameIsOver() {
 
-        return creatures;
-    }
-
-    public boolean gameIsOver(){
-
-        int pontucao = ldr.pontuacao() - resistence.pontuacao();
-        int teasuresPontos=0;
-
-        if (pontucao<0){
-            pontucao = pontucao * -1;
+        int diff =  resistence.getPoints() - ldr.getPoints();
+        if(diff < 0){
+            diff = diff * -1;
+        }
+        int possiblePoints = 0;
+        for (Treasure treasure : treasures) {
+            possiblePoints += treasure.getValue();
         }
 
-        for (Treasure treasure: treasures){
-            teasuresPontos += treasure.getPontos();
-        }
 
-        if (turnosSemTesouro>=15 || treasures.size() <= 0 || pontucao > teasuresPontos){
+        if (treasures.size() == 0 || gameRules.getTurnsWithoutTreasures() >= 15||diff > possiblePoints) {
             return true;
         }
 
@@ -365,62 +437,106 @@ public class FandeisiaGameManager {
         return false;
     }
 
-    public List<String> getAuthors(){
 
-        List<String> creditos = new ArrayList<>();
-        creditos.add("Clinton Afonso" + "|" + "nº:" + "21603860");
-        return creditos;
-    }
 
-    public List<String> getResults(){
 
-        return resultados;
-    }
+    public void setInitialTeam(int teamID) {
+        if (teamID == 20) {
+            resistence.setActive(true);
+            ldr.setActive(false);
 
-    public int getElementId(int x, int y){
-
-        for (Creature creature: creatures){
-            if (creature.getX() == x && creature.getY() == y){
-                return creature.getId();
-            }
+        } else {
+            resistence.setActive(false);
+            ldr.setActive(true);
 
         }
-        for (Treasure treasure: treasures){
-            if (treasure.getX()==x && treasure.getY() == y){
+    }
+
+    public int getCurrentTeamId() {
+        if (resistence.isActive()) {
+            return resistence.getId();
+        }else{
+            return ldr.getId();
+        }
+    }
+
+
+    public int getCoinTotal(int teamID) {
+        if (teamID == 10) {
+            return ldr.getCoins();
+        } else {
+            return resistence.getCoins();
+        }
+    }
+
+    public String whoIsLordEder() {
+        return "Ederzito António Macedo Lopes";
+    }
+
+    public int getElementId(int x, int y) {
+        for (Hole hole : holes) {
+            if (hole.freeSquare(x, y)) {
+                return hole.getId();
+            }
+        }
+        for (Creature creature : creatures) {
+            if (creature.freeSquare(x, y)) {
+                return creature.getId();
+            }
+        }
+        for (Treasure treasure : treasures) {
+            if (treasure.freeSquare(x, y)) {
                 return treasure.getId();
             }
         }
 
-        for (Hole hole: holes){
-            if (hole.getX()==x && hole.getY() == y){
-                return hole.getId();
+        return 0;
+    }
+
+    public List<Creature> getCreatures() {
+        Collections.sort(creatures);
+        return creatures;
+    }
+
+    public String getSpell(int x, int y) {
+        for (Creature c : creatures) {
+            if (c.freeSquare(x, y)) {
+                return c.getEnchantment();
             }
         }
-        return 0;
-    }
-
-    public int getCurrentTeamId(){
-
-        return 0;
-    }
-
-    public int getCurrentScore(int teamID){
-
-        return 0;
-    }
-
-    public int getCoinTotal(int teamID){
-
-        if (teamID==10){
-            return ldr.getMoedas();
-        }
-            return resistence.getMoedas();
-    }
-
-    public String getSpell(int x, int y){
-
         return null;
     }
 
-}
+    public int getCurrentScore(int teamID) {
+        if(teamID == 10){
+            return  ldr.getPoints();
+        }else{
+            return resistence.getPoints();
+        }
+    }
 
+    public List<String> getResults() {
+        List<String> resultList = new ArrayList<>();
+        resultList.add("Welcome to FANDEISIA");
+        if (ldr.getPoints() > resistence.getPoints()) {
+            resultList.add("Resultado: Vitória da equipa LDR");
+            resultList.add("LDR: " + ldr.getPoints());
+            resultList.add("RESISTENCIA: " + resistence.getPoints());
+        } else if (ldr.getPoints() < resistence.getPoints()) {
+            resultList.add("Resultado: Vitória da equipa RESISTENCIA");
+            resultList.add("RESISTENCIA: " + resistence.getPoints());
+            resultList.add("LDR: " + ldr.getPoints());
+        } else {
+            resultList.add("Resultado: EMPATE");
+            resultList.add("LDR: " + ldr.getPoints());
+            resultList.add("RESISTENCIA: " + resistence.getPoints());
+        }
+        resultList.add("Nr. de Turnos jogados: " + gameRules.getTurns());
+        resultList.add("-----");
+        Collections.sort(creatures);
+        for (Creature creature : creatures) {
+            resultList.add(creature.getId() + " : " + creature.getTipo() + " : " + creature.getGold() + " : " + creature.getSilver() + " : " + creature.getBronze() + " : " + creature.getPontos());
+        }
+        return resultList;
+    }
+}
