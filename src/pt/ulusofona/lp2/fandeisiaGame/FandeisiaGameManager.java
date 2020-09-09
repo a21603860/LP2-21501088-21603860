@@ -420,9 +420,9 @@ public class FandeisiaGameManager {
 
     public boolean gameIsOver() {
 
-        int diff =  resistence.getPoints() - ldr.getPoints();
-        if(diff < 0){
-            diff = diff * -1;
+        int diferenca =  resistence.getPoints() - ldr.getPoints();
+        if(diferenca < 0){
+            diferenca = diferenca * -1;
         }
         int possiblePoints = 0;
         for (Treasure treasure : treasures) {
@@ -430,7 +430,7 @@ public class FandeisiaGameManager {
         }
 
 
-        if (treasures.size() == 0 || gameRules.getTurnsWithoutTreasures() >= 15||diff > possiblePoints) {
+        if (treasures.size() == 0 || gameRules.getTurnsWithoutTreasures() >= 15|| diferenca > possiblePoints) {
             return true;
         }
 
