@@ -301,7 +301,7 @@ public abstract class Creature extends GamePieces implements Comparable<Creature
     }
 
     protected void bewitchCreature() {
-        if (!enchantment.equals("Nenhum")) {
+        if (!enchantment.equals("null")) {
             return ;
         }
         switch(enchantment){
