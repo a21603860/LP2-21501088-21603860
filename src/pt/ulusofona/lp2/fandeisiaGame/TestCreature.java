@@ -10,11 +10,9 @@ public class TestCreature {
     public void testeAlteracaoDaorientacao(){
         Druida game = new Druida(1,"druida","norte",10,2,1);
 
-        game.orientacao= "sul";
+        game.orientacao = "sul";
 
-        Druida estadoEsperado =  new Druida(1,"druida","sul",10,2,1);
-
-        assertEquals(estadoEsperado, game.orientacao);
+        assertEquals("sul", game.orientacao);
     }
 
 
