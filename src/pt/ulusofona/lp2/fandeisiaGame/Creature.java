@@ -55,6 +55,10 @@ public abstract class Creature extends GamePieces implements Comparable<Creature
 
 
     public int getRacio() {
+
+        if (getTesouros() == 0){
+            return 0;
+        }
         return passos/getTesouros();
     }
 
@@ -294,13 +298,13 @@ public abstract class Creature extends GamePieces implements Comparable<Creature
 
     protected void clearSpells() {
         if (!enchantment.equals("Freezes4Ever")) {
-            enchantment = "Nenhum";
+            enchantment = "null";
         }
         range = rangeMemory;
     }
 
     protected void bewitchCreature() {
-        if (!enchantment.equals("Nenhum")) {
+        if (enchantment!= null) {
             return ;
         }
         switch(enchantment){
