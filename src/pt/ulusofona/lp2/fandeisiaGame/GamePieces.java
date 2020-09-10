@@ -14,7 +14,7 @@ public class GamePieces {
     }
 
     public int getId() {
-        return id;
+        return this.id;
     }
 
     public boolean freeSquare(int x, int y) {

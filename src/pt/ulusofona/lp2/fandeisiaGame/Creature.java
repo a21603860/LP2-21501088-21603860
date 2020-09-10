@@ -55,9 +55,7 @@ public abstract class Creature extends GamePieces implements Comparable<Creature
 
 
     public int getRacio() {
-
-
-        return passos/ getTesouros();
+        return passos/getTesouros();
     }
 
     public String getTipo() {
@@ -146,7 +144,7 @@ public abstract class Creature extends GamePieces implements Comparable<Creature
     public String toString() {
         if (tipo.equals("Dwarf")) {
             if (enchantment == null) {
-                enchantment = "null";
+                enchantment = "Nenhum";
             }
             return id + " | " + tipo + " | " + teamID + " | " + enchantment + " | " + (gold + silver + bronze) + " @ " + "(" + x + ", " + y + ") " + orientacao;
 
@@ -158,7 +156,7 @@ public abstract class Creature extends GamePieces implements Comparable<Creature
 
 
     protected void move(ArrayList<GamePieces> creaturesAndHoles, GameRules gameRules, ArrayList<Treasure> treasures) {
-        if (!enchantment.equals("null")) {
+        if (!enchantment.equals("Nenhum")) {
             if (enchantment.equals("Congela") || enchantment.equals("Congela4Ever")) {
                 return;
             }
