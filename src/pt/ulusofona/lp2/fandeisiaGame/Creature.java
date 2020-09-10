@@ -226,7 +226,7 @@ public abstract class Creature extends GamePieces implements Comparable<Creature
                     break;
                 case "Este":
                     if (tipoDeMovimento.equals("TodasAsDirecoes")){
-                        orientacao = "Sudeste";
+                        orientacao = "Noroeste";
                     }else {
                         orientacao = "Sul";
                     }
