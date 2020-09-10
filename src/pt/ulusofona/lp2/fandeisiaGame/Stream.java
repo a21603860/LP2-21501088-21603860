@@ -81,7 +81,6 @@ public class Stream {
     }
 
     public List<String> asMaisEficientes(ArrayList<Creature> creatures) {
-
         List<String> maisEficientes = new ArrayList<>();
         creatures.stream()
                 .sorted((s1, s2) -> s1.getRacio() - s2.getRacio())

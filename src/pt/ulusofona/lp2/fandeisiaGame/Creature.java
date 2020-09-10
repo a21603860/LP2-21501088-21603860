@@ -35,7 +35,7 @@ public abstract class Creature extends GamePieces implements Comparable<Creature
         super(id, x, y);
         this.tipo = tipo;
         this.teamID = teamID;
-        this.enchantment = "Nenhum";
+        this.enchantment = "null";
         this.orientacao = orientacao;
         this.image = tipo + ".png";
         this.passos = 0;
@@ -55,6 +55,7 @@ public abstract class Creature extends GamePieces implements Comparable<Creature
 
 
     public int getRacio() {
+
 
         return passos/ getTesouros();
     }
@@ -145,7 +146,7 @@ public abstract class Creature extends GamePieces implements Comparable<Creature
     public String toString() {
         if (tipo.equals("Dwarf")) {
             if (enchantment == null) {
-                enchantment = "Nenhum";
+                enchantment = "null";
             }
             return id + " | " + tipo + " | " + teamID + " | " + enchantment + " | " + (gold + silver + bronze) + " @ " + "(" + x + ", " + y + ") " + orientacao;
 
@@ -157,7 +158,7 @@ public abstract class Creature extends GamePieces implements Comparable<Creature
 
 
     protected void move(ArrayList<GamePieces> creaturesAndHoles, GameRules gameRules, ArrayList<Treasure> treasures) {
-        if (!enchantment.equals("Nenhum")) {
+        if (!enchantment.equals("null")) {
             if (enchantment.equals("Congela") || enchantment.equals("Congela4Ever")) {
                 return;
             }
@@ -301,7 +302,7 @@ public abstract class Creature extends GamePieces implements Comparable<Creature
     }
 
     protected void bewitchCreature() {
-        if (!enchantment.equals("null")) {
+        if (!enchantment.equals("Nenhum")) {
             return ;
         }
         switch(enchantment){
