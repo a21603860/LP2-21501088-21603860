@@ -35,7 +35,7 @@ public abstract class Creature extends GamePieces implements Comparable<Creature
         super(id, x, y);
         this.tipo = tipo;
         this.teamID = teamID;
-        this.enchantment = null;
+        this.enchantment = "null";
         this.orientacao = orientacao;
         this.image = tipo + ".png";
         this.passos = 0;
