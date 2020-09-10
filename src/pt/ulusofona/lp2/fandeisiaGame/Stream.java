@@ -96,7 +96,7 @@ public class Stream {
         creatures.stream()
                 .sorted((s1, s2) -> s2.getTesouros() - s1.getTesouros())
                 .limit(3)
-                .forEach((c) -> tresMaisCarregadas.add(c.getId() + ":" + c.getTipo() + ":" + c.getTesouros()));
+                .forEach((c) -> tresMaisCarregadas.add(c.getId() + ":" +  c.getTesouros()));
         return tresMaisCarregadas;
     }
 
