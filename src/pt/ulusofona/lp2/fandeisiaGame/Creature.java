@@ -185,12 +185,12 @@ public abstract class Creature extends GamePieces implements Comparable<Creature
                     passos += range;
                     x -= range;
                     break;
-                case "Noroeste":
+                case "Sudeste":
                     passos += range;
                     x -= range;
                     y -= range;
                     break;
-                case "Sudeste":
+                case "Noroeste":
                     passos += range;
                     x += range;
                     y += range;
